@@ -1,0 +1,41 @@
+@import "tailwindcss";
+
+/* ─── Academic Pulse Design Tokens ─────────────────────────────── */
+@theme inline {
+  /* Colours */
+  --color-primary:            #1E3A8A;
+  --color-primary-dark:       #00236f;
+  --color-primary-container:  #dce1ff;
+  --color-accent:             #EAB308;
+  --color-accent-foreground:  #1E3A8A;
+  --color-surface:            #f7f9fb;
+  --color-surface-container:  #eceef0;
+  --color-surface-low:        #f2f4f6;
+  --color-on-surface:         #191c1e;
+  --color-on-surface-variant: #444651;
+  --color-outline:            #757682;
+  --color-outline-variant:    #c5c5d3;
+  --color-error:              #ba1a1a;
+  --color-background:         #f7f9fb;
+  --color-foreground:         #191c1e;
+
+  /* Typography — set by next/font via CSS variables */
+  --font-display: var(--font-display), "Manrope", sans-serif;
+  --font-sans:    var(--font-sans), "Inter", sans-serif;
+}
+
+:root {
+  --background: #f7f9fb;
+  --foreground: #191c1e;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), sans-serif;
+}
