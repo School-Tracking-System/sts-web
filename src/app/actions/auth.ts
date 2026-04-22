@@ -4,9 +4,22 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { fetchApi } from "@/lib/api-client";
 
+interface User {
+  id: string;
+  email: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  role: string;
+  is_active: boolean;
+}
+
 interface AuthResponse {
-  access_token: string;
-  refresh_token: string;
+  user: User;
+  tokens: {
+    access_token: string;
+    refresh_token: string;
+  };
 }
 
 export async function loginAction(prevState: any, formData: FormData) {
@@ -27,14 +40,14 @@ export async function loginAction(prevState: any, formData: FormData) {
     });
 
     // Extraer role de la carga útil del JWT
-    const payloadBase64 = data.access_token.split('.')[1];
+    const payloadBase64 = data.tokens.access_token.split('.')[1];
     const payloadString = Buffer.from(payloadBase64, 'base64').toString('utf-8');
     const tokenData = JSON.parse(payloadString);
-    const userRole = tokenData.role || "parent"; // Fallback seguro
+    const userRole = tokenData.role || data.user.role || "parent";
 
     // Guardar tokens de manera segura
     const cookieStore = await cookies();
-    cookieStore.set("session_token", data.access_token, {
+    cookieStore.set("session_token", data.tokens.access_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -42,7 +55,7 @@ export async function loginAction(prevState: any, formData: FormData) {
       path: "/",
     });
 
-    cookieStore.set("refresh_token", data.refresh_token, {
+    cookieStore.set("refresh_token", data.tokens.refresh_token, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: "lax",
@@ -54,13 +67,14 @@ export async function loginAction(prevState: any, formData: FormData) {
     cookieStore.set("user_role", userRole, {
       httpOnly: false, // exposed for frontend usage if needed
       secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
       maxAge: 60 * 60 * 24 * 7,
       path: "/",
     });
 
     isSuccess = true;
   } catch (error: any) {
-    console.error("Login Server Action Error:", error.message);
+    console.error("Login Server Action Error:", error);
     return { error: "Credenciales inválidas o el servicio no está disponible." };
   }
 

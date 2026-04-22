@@ -54,7 +54,7 @@ export function StudentsTable({ students }: StudentsTableProps) {
                         <div className="flex items-center gap-1.5 text-xs text-on-surface-variant mt-1.5">
                           <MapPin size={12} className="shrink-0" />
                           <span className="truncate max-w-[200px] xl:max-w-[300px]">
-                            {student.address}
+                            {student.pickup_address}
                           </span>
                         </div>
                       </div>

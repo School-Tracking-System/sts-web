@@ -1,6 +1,6 @@
 import { cookies } from "next/headers";
 
-const GATEWAY_URL = process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:8000/api/v1";
+const GATEWAY_URL = process.env.INTERNAL_GATEWAY_URL || process.env.NEXT_PUBLIC_GATEWAY_URL || "http://localhost:8000/api/v1";
 
 interface FetchOptions extends RequestInit {
   requireAuth?: boolean;
@@ -24,7 +24,7 @@ export async function fetchApi<T>(
 
   let authHeader = {};
   const cookieStore = await cookies();
-  
+
   if (requireAuth) {
     const token = cookieStore.get("session_token")?.value;
     if (token) {
@@ -33,6 +33,8 @@ export async function fetchApi<T>(
       };
     }
   }
+
+  console.log(restOptions)
 
   let response = await fetch(`${GATEWAY_URL}${endpoint}`, {
     ...restOptions,
@@ -43,10 +45,11 @@ export async function fetchApi<T>(
     },
   });
 
+
   // Handle 401 Unauthorized (Potential Expired Token)
   if (response.status === 401 && requireAuth) {
     const refreshToken = cookieStore.get("refresh_token")?.value;
-    
+
     if (refreshToken) {
       console.log("[api-client] Attempting token refresh...");
       const refreshResponse = await fetch(`${GATEWAY_URL}/auth/refresh`, {
@@ -57,7 +60,7 @@ export async function fetchApi<T>(
 
       if (refreshResponse.ok) {
         const tokenData = await refreshResponse.json() as TokenResponse;
-        
+
         // Try to update cookies. This only works in Server Actions or Middleware.
         // In Server Components, this will throw an error, which is caught.
         try {

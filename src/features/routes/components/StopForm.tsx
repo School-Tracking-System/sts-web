@@ -16,7 +16,7 @@ export function StopForm() {
   } = useForm<StopModel>({
     resolver: zodResolver(stopSchema),
     defaultValues: {
-      routeId: "1", // simulated default selection
+      route_id: "1", // simulated default selection
       order: 1
     },
   });
@@ -39,21 +39,21 @@ export function StopForm() {
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <div className="space-y-2">
-            <label htmlFor="routeId" className="text-sm font-medium text-on-surface">Ruta Padre</label>
+            <label htmlFor="route_id" className="text-sm font-medium text-on-surface">Ruta Padre</label>
              <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
                 <Route size={16} />
               </div>
               <select
-                id="routeId"
-                {...register("routeId")}
+                id="route_id"
+                {...register("route_id")}
                 className="w-full pl-10 pr-4 py-2.5 appearance-none rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
               >
                 <option value="1">Ruta Norte 01</option>
                 <option value="2">Ruta Sur-Centro</option>
               </select>
             </div>
-            {errors.routeId && <p className="text-xs text-error font-medium">{errors.routeId.message}</p>}
+            {errors.route_id && <p className="text-xs text-error font-medium">{errors.route_id.message}</p>}
           </div>
 
           <div className="space-y-2">

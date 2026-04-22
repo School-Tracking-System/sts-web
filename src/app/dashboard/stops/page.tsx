@@ -9,7 +9,7 @@ async function getStops(): Promise<StopModel[]> {
   return [
     {
       id: "1",
-      routeId: "1",
+      route_id: "1",
       name: "Terminal Terrestre (P1)",
       order: 1,
       eta: "06:00",
@@ -17,7 +17,7 @@ async function getStops(): Promise<StopModel[]> {
     },
     {
       id: "2",
-      routeId: "1",
+      route_id: "1",
       name: "Av. Juan Tanca Marengo (P2)",
       order: 2,
       eta: "06:15",
@@ -25,7 +25,7 @@ async function getStops(): Promise<StopModel[]> {
     },
     {
       id: "3",
-      routeId: "1",
+      route_id: "1",
       name: "Santuario Schoenstatt (P3)",
       order: 3,
       eta: "06:30",
