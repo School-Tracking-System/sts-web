@@ -4,7 +4,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import { fetchApi } from "@/lib/api-client";
 
-interface User {
+export interface User {
   id: string;
   email: string;
   first_name: string;
@@ -89,4 +89,57 @@ export async function logoutAction() {
   cookieStore.delete("refresh_token");
   cookieStore.delete("user_role");
   redirect("/login");
+}
+
+export async function getUsersAction(role?: string): Promise<User[]> {
+  try {
+    const data = await fetchApi<User[]>(`/auth/users${role ? `?role=${role}` : ""}`, {
+      method: "GET",
+      requireAuth: true,
+    });
+    return data;
+  } catch (error) {
+    console.error("GetUsers Server Action Error:", error);
+    return [];
+  }
+}
+
+import { revalidatePath } from "next/cache";
+
+export async function registerUserAction(
+  prevState: any,
+  formData: FormData
+) {
+  const first_name = formData.get("first_name") as string;
+  const last_name = formData.get("last_name") as string;
+  const email = formData.get("email") as string;
+  const password = formData.get("password") as string;
+  const phone = formData.get("phone") as string;
+  const role = formData.get("role") as string;
+
+  if (!first_name || !last_name || !email || !password || !role) {
+    return { error: "Todos los campos obligatorios deben estar llenos." };
+  }
+
+  try {
+    await fetchApi<any>("/auth/register", {
+      method: "POST",
+      body: JSON.stringify({
+        email,
+        password,
+        first_name,
+        last_name,
+        phone: phone || undefined,
+        role,
+      }),
+    });
+  } catch (error: any) {
+    console.error("RegisterUser Server Action Error:", error.message);
+    return { error: "Error al registrar el usuario: " + (error.message || "desconocido") };
+  }
+
+  revalidatePath("/dashboard/users");
+  
+  // We return success instead of redirecting so the modal can close
+  return { success: true };
 }

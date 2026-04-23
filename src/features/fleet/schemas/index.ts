@@ -44,14 +44,13 @@ export type DriverApi = z.infer<typeof driverApiSchema>;
 
 // ─── Driver Form Schema ───────────────────────────────────────────────────────
 export const driverFormSchema = z.object({
-  first_name: z.string().min(2, "Nombre requerido"),
-  last_name: z.string().min(2, "Apellido requerido"),
-  phone: z.string().min(7, "Teléfono requerido"),
+  user_id: z.string().min(1, "Seleccione un usuario"),
   license_number: z.string().min(5, "Número de licencia requerido"),
   license_type: z.string().min(1, "Tipo de licencia requerido"),
-  license_expiry: z.string().optional(),
+  license_expiry: z.string().min(1, "Fecha de vencimiento requerida"),
+  cedula_id: z.string().min(10, "Cédula requerida (10 dígitos)"),
+  emergency_phone: z.string().min(7, "Teléfono de emergencia requerido"),
   status: z.enum(["active", "inactive", "on_leave"]),
-  user_id: z.string().optional(),
 });
 export type DriverForm = z.infer<typeof driverFormSchema>;
 

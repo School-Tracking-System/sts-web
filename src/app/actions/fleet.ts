@@ -71,31 +71,29 @@ export async function createDriverAction(
   _prevState: any,
   formData: FormData
 ) {
-  const first_name = formData.get("first_name") as string;
-  const last_name = formData.get("last_name") as string;
-  const phone = formData.get("phone") as string;
+  const user_id = formData.get("user_id") as string;
   const license_number = formData.get("license_number") as string;
   const license_type = formData.get("license_type") as string;
-  const license_expiry = formData.get("license_expiry") as string | undefined;
+  const license_expiry = formData.get("license_expiry") as string;
+  const cedula_id = formData.get("cedula_id") as string;
+  const emergency_phone = formData.get("emergency_phone") as string;
   const status = formData.get("status") as string || "active";
-  const user_id = formData.get("user_id") as string | undefined;
 
-  if (!first_name || !last_name || !license_number) {
-    return { error: "Nombres, apellidos y número de licencia son obligatorios." };
+  if (!user_id || !license_number || !cedula_id) {
+    return { error: "Usuario, número de licencia y cédula son obligatorios." };
   }
 
   try {
     await fetchApi<DriverApi>("/fleet/drivers", {
       method: "POST",
       body: JSON.stringify({ 
-        first_name, 
-        last_name, 
-        phone, 
+        user_id, 
         license_number, 
         license_type, 
         license_expiry, 
+        cedula_id, 
+        emergency_phone,
         status, 
-        user_id 
       }),
     });
   } catch (error: any) {

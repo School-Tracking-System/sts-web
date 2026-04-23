@@ -1,7 +1,10 @@
 import { Header } from "@/components/layout/header";
 import { DriverForm } from "@/features/fleet/components/DriverForm";
+import { getUsersAction } from "@/app/actions/auth";
 
-export default function NewDriverPage() {
+export default async function NewDriverPage() {
+  const users = await getUsersAction("driver");
+
   return (
     <>
       <Header
@@ -11,7 +14,7 @@ export default function NewDriverPage() {
 
       <main className="flex-1 px-8 py-8">
         <div className="max-w-3xl mx-auto">
-          <DriverForm />
+          <DriverForm users={users} />
         </div>
       </main>
     </>

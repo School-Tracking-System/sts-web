@@ -7,15 +7,19 @@ import { DriverForm as DriverFormType, driverFormSchema } from "../schemas";
 import { User, Phone, ShieldCheck, Activity, AlertCircle, Calendar } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createDriverAction } from "@/app/actions/fleet";
+import { type User as AuthUser } from "@/app/actions/auth";
 
-export function DriverForm() {
+interface DriverFormProps {
+  users: AuthUser[];
+}
+
+export function DriverForm({ users }: DriverFormProps) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createDriverAction, null);
-  
+
   const {
     register,
-    handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<DriverFormType>({
     resolver: zodResolver(driverFormSchema),
     defaultValues: {
@@ -39,66 +43,99 @@ export function DriverForm() {
         </h2>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          {/* First Name */}
-          <div className="space-y-2">
-            <label htmlFor="first_name" className="text-sm font-medium text-on-surface">
-              Nombres
+          {/* User Selection */}
+          <div className="md:col-span-2 space-y-2">
+            <label htmlFor="user_id" className="text-sm font-medium text-on-surface">
+              Usuario del Sistema
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
                 <User size={16} />
               </div>
-              <input
-                id="first_name"
-                {...register("first_name")}
-                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
-                placeholder="Ej. Juan"
-              />
+              <select
+                id="user_id"
+                {...register("user_id")}
+                className="w-full pl-10 pr-10 py-2.5 appearance-none rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
+              >
+                <option value="">Seleccione un usuario...</option>
+                {users.map((u) => (
+                  <option key={u.id} value={u.id}>
+                    {u.first_name} {u.last_name} ({u.email})
+                  </option>
+                ))}
+              </select>
+              <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-on-surface-variant">
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+              </div>
             </div>
-            {errors.first_name && (
-              <p className="text-xs text-error font-medium">{errors.first_name.message}</p>
+            {errors.user_id && (
+              <p className="text-xs text-error font-medium">{errors.user_id.message}</p>
             )}
+            <p className="text-[10px] text-on-surface-variant/70 italic">
+              * Solo aparecen usuarios con rol de conductor.
+            </p>
           </div>
 
-          {/* Last Name */}
+          {/* Cedula ID */}
           <div className="space-y-2">
-            <label htmlFor="last_name" className="text-sm font-medium text-on-surface">
-              Apellidos
+            <label htmlFor="cedula_id" className="text-sm font-medium text-on-surface">
+              Cédula de Identidad
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
-                <User size={16} />
+                <ShieldCheck size={16} />
               </div>
               <input
-                id="last_name"
-                {...register("last_name")}
+                id="cedula_id"
+                {...register("cedula_id")}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
-                placeholder="Ej. Pérez"
+                placeholder="Ej. 1712345678"
               />
             </div>
-            {errors.last_name && (
-              <p className="text-xs text-error font-medium">{errors.last_name.message}</p>
+            {errors.cedula_id && (
+              <p className="text-xs text-error font-medium">{errors.cedula_id.message}</p>
             )}
           </div>
 
-          {/* Phone */}
+          {/* Emergency Phone */}
           <div className="space-y-2">
-            <label htmlFor="phone" className="text-sm font-medium text-on-surface">
-              Teléfono móvil
+            <label htmlFor="emergency_phone" className="text-sm font-medium text-on-surface">
+              Teléfono de emergencia
             </label>
             <div className="relative">
               <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
                 <Phone size={16} />
               </div>
               <input
-                id="phone"
-                {...register("phone")}
+                id="emergency_phone"
+                {...register("emergency_phone")}
                 className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
                 placeholder="+593 99 999 9999"
               />
             </div>
-            {errors.phone && (
-              <p className="text-xs text-error font-medium">{errors.phone.message}</p>
+            {errors.emergency_phone && (
+              <p className="text-xs text-error font-medium">{errors.emergency_phone.message}</p>
+            )}
+          </div>
+
+          {/* License Expiry */}
+          <div className="space-y-2">
+            <label htmlFor="license_expiry" className="text-sm font-medium text-on-surface">
+              Vencimiento de Licencia
+            </label>
+            <div className="relative">
+              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
+                <Calendar size={16} />
+              </div>
+              <input
+                id="license_expiry"
+                type="date"
+                {...register("license_expiry")}
+                className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
+              />
+            </div>
+            {errors.license_expiry && (
+              <p className="text-xs text-error font-medium">{errors.license_expiry.message}</p>
             )}
           </div>
 
@@ -135,7 +172,7 @@ export function DriverForm() {
               <select
                 id="license_type"
                 {...register("license_type")}
-                className="w-full pl-10 pr-4 py-2.5 appearance-none rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
+                className="w-full pl-10 pr-10 py-2.5 appearance-none rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
               >
                 <option value="Tipo B">Tipo B (Automóvil)</option>
                 <option value="Tipo C">Tipo C (Camiones pequeños)</option>
