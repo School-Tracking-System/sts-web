@@ -21,18 +21,21 @@ export const routeFormSchema = z.object({
   direction: z.enum(["to_school", "from_school"]),
   schedule_time: z.string().min(5, "Hora de inicio requerida (HH:MM)"),
   vehicle_id: z.string().optional(),
-  school_id: z.string().optional(),
+  driver_id: z.string().optional(),
+  school_id: z.string().min(1, "Colegio es requerido"),
 });
 export type RouteForm = z.infer<typeof routeFormSchema>;
 
-// ─── Stop Schema (unchanged structure) ───────────────────────────────────────
+// ─── Stop Schema (Updated) ──────────────────────────────────────────────────
 export const stopApiSchema = z.object({
   id: z.string().optional(),
-  route_id: z.string().min(1, "Ruta principal obligatoria"),
-  name: z.string().min(2, "Nombre de parada"),
-  address: z.string().min(5, "Dirección o referencia"),
-  order: z.number().int().min(1, "Orden de paso"),
-  eta: z.string().optional().nullable(),
+  route_id: z.string().min(1, "Debe seleccionar una ruta de transporte"),
+  student_id: z.string().min(1, "Debe seleccionar un estudiante para esta parada"),
+  address: z.string().min(5, "La dirección debe tener al menos 5 caracteres"),
+  order: z.coerce.number().int().min(1, "El orden debe ser un número entero positivo"),
+  eta: z.string().regex(/^([01]\d|2[0-3]):([0-5]\d)$/, "Formato de hora inválido (HH:MM)"),
+  latitude: z.coerce.number().optional().nullable(),
+  longitude: z.coerce.number().optional().nullable(),
 });
 export type StopApi = z.infer<typeof stopApiSchema>;
 

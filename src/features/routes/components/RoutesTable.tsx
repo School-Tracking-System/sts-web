@@ -38,7 +38,7 @@ export function RoutesTable({ routes }: RoutesTableProps) {
               </tr>
             ) : (
               routes.map((route) => (
-                <tr 
+                <tr
                   key={route.id}
                   className="hover:bg-surface-low/40 transition-colors group"
                 >
@@ -57,12 +57,12 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                       </div>
                     </div>
                   </td>
-                  
+
                   <td className="px-6 py-4 hidden md:table-cell">
                     <div className="flex items-center gap-2 text-sm text-on-surface font-medium">
                       <Clock size={16} className="text-on-surface-variant" />
                       {route.schedule_time
-                        ? new Date(route.schedule_time).toLocaleTimeString('es-ES', { hour: '2-digit', minute: '2-digit' })
+                        ? route.schedule_time
                         : '—'
                       }
                     </div>
@@ -71,32 +71,32 @@ export function RoutesTable({ routes }: RoutesTableProps) {
                   <td className="px-6 py-4 hidden lg:table-cell">
                     <div className="flex flex-col gap-1.5 text-xs text-on-surface-variant font-medium">
                       {route.vehicle_id ? (
-                         <span>Vehículo: <span className="font-mono text-on-surface">{route.vehicle_id}</span></span>
+                        <span>Vehículo: <span className="font-mono text-on-surface">{route.vehicle_id}</span></span>
                       ) : (
-                        <span className="flex items-center gap-1 text-red-600"><ShieldAlert size={12}/> Sin vehículo asociado</span>
+                        <span className="flex items-center gap-1 text-red-600"><ShieldAlert size={12} /> Sin vehículo asociado</span>
                       )}
-                      
+
                       {route.driver_id ? (
-                         <span>Conductor principal asignado</span>
+                        <span>Conductor principal asignado</span>
                       ) : (
-                        <span className="flex items-center gap-1 text-amber-600"><ShieldAlert size={12}/> Sin conductor asociado</span>
+                        <span className="flex items-center gap-1 text-amber-600"><ShieldAlert size={12} /> Sin conductor asociado</span>
                       )}
                     </div>
                   </td>
 
                   <td className="px-6 py-4">
-                    <span 
+                    <span
                       className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold
                         ${route.is_active
-                          ? 'bg-blue-50 text-blue-700' 
+                          ? 'bg-blue-50 text-blue-700'
                           : 'bg-surface-container text-on-surface-variant'
                         }
                       `}
                     >
-                      <span 
+                      <span
                         className={`w-1.5 h-1.5 rounded-full 
                           ${route.is_active ? 'bg-blue-500' : 'bg-outline-variant'}
-                        `} 
+                        `}
                       />
                       {route.is_active ? 'Operativa' : 'Suspendida'}
                     </span>

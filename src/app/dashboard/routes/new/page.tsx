@@ -1,7 +1,15 @@
 import { Header } from "@/components/layout/header";
 import { RouteForm } from "@/features/routes/components/RouteForm";
+import { getSchoolsAction } from "@/app/actions/schools";
+import { getVehiclesAction, getDriversAction } from "@/app/actions/fleet";
 
-export default function NewRoutePage() {
+export default async function NewRoutePage() {
+  const [schools, vehicles, drivers] = await Promise.all([
+    getSchoolsAction(),
+    getVehiclesAction(),
+    getDriversAction()
+  ]);
+
   return (
     <>
       <Header
@@ -11,7 +19,7 @@ export default function NewRoutePage() {
 
       <main className="flex-1 px-8 py-8">
         <div className="max-w-3xl mx-auto">
-          <RouteForm />
+          <RouteForm schools={schools} vehicles={vehicles} drivers={drivers} />
         </div>
       </main>
     </>

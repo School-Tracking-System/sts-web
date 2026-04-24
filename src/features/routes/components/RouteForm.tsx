@@ -4,11 +4,19 @@ import { useActionState } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { RouteForm as RouteFormType, routeFormSchema } from "../schemas";
-import { Route as RouteIcon, Clock, Navigation, CarFront, Building, AlertCircle } from "lucide-react";
+import { Route as RouteIcon, Clock, Navigation, CarFront, Building, AlertCircle, UserCheck } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { createRouteAction } from "@/app/actions/routes";
+import { SchoolApi } from "@/features/schools/schemas";
+import { VehicleApi, DriverApi } from "@/features/fleet/schemas";
 
-export function RouteForm() {
+interface RouteFormProps {
+  schools: SchoolApi[];
+  vehicles: VehicleApi[];
+  drivers: DriverApi[];
+}
+
+export function RouteForm({ schools, vehicles, drivers }: RouteFormProps) {
   const router = useRouter();
   const [state, formAction, isPending] = useActionState(createRouteAction, null);
   
@@ -70,8 +78,9 @@ export function RouteForm() {
                 className="w-full pl-10 pr-4 py-2.5 appearance-none rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30"
               >
                 <option value="">-- Seleccionar Colegio --</option>
-                <option value="1">Colegio San Marcos</option>
-                <option value="2">Unidad Educativa Bilingüe Internacional</option>
+                {schools.map(school => (
+                  <option key={school.id} value={school.id}>{school.name}</option>
+                ))}
               </select>
               <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-on-surface-variant">
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
@@ -129,13 +138,39 @@ export function RouteForm() {
                     className="w-full px-4 py-2.5 rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30 appearance-none"
                   >
                     <option value="">-- Sin asignar --</option>
-                    <option value="1">PBB-1290 (Mercedes-Benz 22p)</option>
-                    <option value="2">XAC-9428 (Hino AK 45p)</option>
+                    {vehicles.map(vehicle => (
+                      <option key={vehicle.id} value={vehicle.id}>{vehicle.plate} ({vehicle.brand} {vehicle.model})</option>
+                    ))}
                   </select>
                   <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-on-surface-variant">
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
                   </div>
                 </div>
+            </div>
+         </div>
+
+         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+            <div className="space-y-2">
+                <label htmlFor="driver_id" className="text-sm font-medium text-on-surface">Conductor Asignado (Opcional)</label>
+                <div className="relative">
+                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-on-surface-variant">
+                    <UserCheck size={16} />
+                  </div>
+                  <select
+                    id="driver_id"
+                    {...register("driver_id")}
+                    className="w-full pl-10 pr-4 py-2.5 rounded-xl border border-outline-variant/60 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none transition-all text-sm text-on-surface bg-surface-low/30 appearance-none"
+                  >
+                    <option value="">-- Sin asignar --</option>
+                    {drivers.map(driver => (
+                      <option key={driver.id} value={driver.id}>{driver.license_number} ({driver.first_name} {driver.last_name})</option>
+                    ))}
+                  </select>
+                  <div className="absolute inset-y-0 right-0 flex items-center px-3 pointer-events-none text-on-surface-variant">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 9l-7 7-7-7"></path></svg>
+                  </div>
+                </div>
+                {errors.driver_id && <p className="text-xs text-error font-medium">{errors.driver_id.message}</p>}
             </div>
          </div>
        </div>

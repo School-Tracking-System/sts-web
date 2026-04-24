@@ -1,11 +1,16 @@
-import { StopModel } from "../schemas";
-import { MapPin, Clock, MapPinned } from "lucide-react";
+import { StopApi } from "../schemas";
+import { StudentApi } from "@/features/students/schemas";
+import { MapPin, Clock, User } from "lucide-react";
 
 interface StopsTableProps {
-  stops: StopModel[];
+  stops: StopApi[];
+  students?: StudentApi[];
 }
 
-export function StopsTable({ stops }: StopsTableProps) {
+export function StopsTable({ stops, students = [] }: StopsTableProps) {
+  // Create a map for quick student lookup
+  const studentMap = new Map(students.map(s => [s.id, `${s.first_name} ${s.last_name}`]));
+
   return (
     <div className="bg-white border border-outline-variant/40 rounded-2xl shadow-sm overflow-hidden">
       <div className="overflow-x-auto">
@@ -16,7 +21,7 @@ export function StopsTable({ stops }: StopsTableProps) {
                 Orden
               </th>
               <th className="px-6 py-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider">
-                Punto de Parada
+                Estudiante / Parada
               </th>
               <th className="px-6 py-4 text-xs font-semibold text-on-surface-variant uppercase tracking-wider hidden md:table-cell">
                 Ubicación
@@ -30,11 +35,11 @@ export function StopsTable({ stops }: StopsTableProps) {
             {stops.length === 0 ? (
               <tr>
                 <td colSpan={4} className="px-6 py-12 text-center text-on-surface-variant">
-                  Aún no hay paradas trazadas.
+                  Aún no hay paradas trazadas para esta ruta.
                 </td>
               </tr>
             ) : (
-              stops.sort((a,b) => a.order - b.order).map((stop) => (
+              [...stops].sort((a,b) => a.order - b.order).map((stop) => (
                 <tr 
                   key={stop.id}
                   className="hover:bg-surface-low/40 transition-colors group"
@@ -46,9 +51,16 @@ export function StopsTable({ stops }: StopsTableProps) {
                   </td>
                   
                   <td className="px-6 py-4">
-                     <div className="flex items-center gap-3">
-                        <MapPinned size={18} className="text-primary/70" />
-                        <span className="font-semibold text-sm text-on-surface">{stop.name}</span>
+                     <div className="flex flex-col">
+                        <div className="flex items-center gap-2">
+                           <User size={16} className="text-primary/70" />
+                           <span className="font-semibold text-sm text-on-surface">
+                             {studentMap.get(stop.student_id) || "Estudiante Desconocido"}
+                           </span>
+                        </div>
+                        <span className="text-xs text-on-surface-variant ml-6">
+                          ID: {stop.student_id.split('-')[0]}...
+                        </span>
                      </div>
                   </td>
 

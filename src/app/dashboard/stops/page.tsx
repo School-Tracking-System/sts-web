@@ -1,73 +1,69 @@
 import { Header } from "@/components/layout/header";
 import { StopsTable } from "@/features/routes/components/StopsTable";
-import { StopModel } from "@/features/routes/schemas";
-import { Plus } from "lucide-react";
+import { RouteFilter } from "@/features/routes/components/RouteFilter";
+import { getRoutesAction, getRouteStopsAction } from "@/app/actions/routes";
+import { getStudentsAction } from "@/app/actions/students";
+import { StopApi } from "@/features/routes/schemas";
+import { Plus, MapPin } from "lucide-react";
 import Link from "next/link";
 
-// Mock Data
-async function getStops(): Promise<StopModel[]> {
-  return [
-    {
-      id: "1",
-      route_id: "1",
-      name: "Terminal Terrestre (P1)",
-      order: 1,
-      eta: "06:00",
-      address: "Av. de las Américas y Benjamín Rosales",
-    },
-    {
-      id: "2",
-      route_id: "1",
-      name: "Av. Juan Tanca Marengo (P2)",
-      order: 2,
-      eta: "06:15",
-      address: "Atrás del Mall del Sol",
-    },
-    {
-      id: "3",
-      route_id: "1",
-      name: "Santuario Schoenstatt (P3)",
-      order: 3,
-      eta: "06:30",
-      address: "Ciudadela Bellavista",
-    },
-  ];
-}
+export default async function StopsPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ routeId?: string }>;
+}) {
+  const [routes, students, resolvedSearchParams] = await Promise.all([
+    getRoutesAction(),
+    getStudentsAction(),
+    searchParams,
+  ]);
 
-export default async function StopsPage() {
-  const stops = await getStops();
+  const selectedRouteId = resolvedSearchParams.routeId || (routes.length > 0 ? routes[0].id : undefined);
+  
+  let stops: StopApi[] = [];
+  if (selectedRouteId) {
+    stops = await getRouteStopsAction(selectedRouteId);
+  }
 
   return (
-    <>
+    <div className="min-h-screen bg-surface-lowest flex flex-col">
       <Header
-        title="Puntos de Control (Paradas)"
-        subtitle="Administra georreferencias y tiempos de paso por ruta"
+        title="Gestión de Paradas"
+        subtitle="Optimiza los tiempos y ubicaciones de recolección"
       />
 
       <main className="flex-1 px-8 py-8 space-y-6">
-        {/* Actions bar */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center justify-between">
-          <div className="flex-1 w-full max-w-sm">
-            {/* Si tuviéramos un input de búsqueda local iría aquí */}
-          </div>
+        {/* Barra de Acciones Reactiva */}
+        <div className="flex flex-col md:flex-row gap-4 items-center justify-between bg-white p-4 rounded-2xl border border-outline-variant/30 shadow-sm">
+          <RouteFilter routes={routes} selectedRouteId={selectedRouteId} />
           
           <Link 
             href="/dashboard/stops/new"
             className="
-              flex items-center gap-2 px-5 py-2.5 rounded-xl
+              flex items-center gap-2 px-6 py-2.5 rounded-xl
               bg-[#EAB308] text-[#0f1b38] font-bold text-sm
-              hover:bg-[#facc15] hover:shadow-lg hover:shadow-yellow-500/20
+              hover:shadow-lg hover:shadow-yellow-500/20
               active:scale-[0.98] transition-all duration-200
+              w-full md:w-auto justify-center
             "
           >
             <Plus size={18} strokeWidth={2.5} />
-            Fijar Punto
+            Nueva Parada
           </Link>
         </div>
 
-        {/* Table */}
-        <StopsTable stops={stops} />
+        {/* Sección de Tabla con Empty State mejorado */}
+        {routes.length === 0 ? (
+          <div className="flex flex-col items-center justify-center py-20 bg-white rounded-3xl border-2 border-dashed border-outline-variant/50">
+             <MapPin size={48} className="text-on-surface-variant/30 mb-4" />
+             <h3 className="text-lg font-bold text-on-surface">No hay rutas configuradas</h3>
+             <p className="text-on-surface-variant text-sm mb-6">Debes crear una ruta antes de poder asignar paradas.</p>
+             <Link href="/dashboard/routes" className="text-primary font-bold hover:underline">Ir a Rutas</Link>
+          </div>
+        ) : (
+          <StopsTable stops={stops} students={students} />
+        )}
       </main>
-    </>
+    </div>
   );
 }
